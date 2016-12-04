@@ -9,6 +9,7 @@
 #define PROGBAR_END_SIGN ']'
 #define PROGBAR_FILL_SIGN '#'
 #define PROGBAR_EMPTY_SIGN ' '
+#define PROGBAR_CLEAR_SIGN ' '
 
 
 typedef struct PROGRESSBAR_s{
@@ -20,8 +21,8 @@ typedef struct PROGRESSBAR_s{
 } ProgBar;
 
 void InitProgBar(ProgBar *bar, unsigned int length);
+void ResizeProgBar(ProgBar *bar, unsigned int length);
 void UpdateProgBar(ProgBar *bar, double current_progress);
-void DrawProgBar(ProgBar *bar);
 void FinishProgBar(ProgBar *bar);
 
 

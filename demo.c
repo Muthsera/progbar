@@ -10,7 +10,7 @@
 int main()
 {
 	ProgBar bar;
-	InitProgBar(&bar,50);
+	InitProgBar(&bar,80);
 
 	double x1 = -2.0;
 	double x2 = 2.0;
@@ -22,6 +22,9 @@ int main()
 	double dy = ( y2 - y1 ) / ( Ny - 1 );
 
 	for (size_t i=0; i<Ny; i++) {
+		if ( i == Ny/2 ) {
+			ResizeProgBar(&bar,40);
+		}
 		UpdateProgBar(&bar,(double)i/Ny);
 		double y = y1 + i*dy;
 		for (size_t j=0; j<Nx; j++) {

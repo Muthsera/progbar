@@ -1,13 +1,48 @@
 #include "progbar.h"
 
+static void DrawProgBar(ProgBar *bar)
+{
+	unsigned int empty_length = bar->length - bar->current_length;
+	fputc(PROGBAR_START_SIGN,bar->stream);
+	for (unsigned int i=0; i<bar->current_length; i++) {
+		fputc(PROGBAR_FILL_SIGN,bar->stream);
+	}
+	for (unsigned int i=0; i<empty_length; i++) {
+		fputc(PROGBAR_EMPTY_SIGN,bar->stream);
+	}
+	fputc(PROGBAR_END_SIGN,bar->stream);
+	fprintf(bar->stream," %3u%%",bar->percent);
+	fflush(bar->stream);
+}
+
+static void ClearProgBar(ProgBar *bar)
+{
+	fputc('\r',bar->stream);
+	for (unsigned int i=0; i<bar->length+7; i++) {
+		fputc(PROGBAR_CLEAR_SIGN,bar->stream);
+	}
+}
+
 void InitProgBar(ProgBar *bar, unsigned int length)
 {
-	bar->stream = stderr;
+	bar->stream = stdout;
 	bar->length = length;
 	bar->percent = 0;
 	bar->current_length = 0;
 	bar->progress = 0.0;
 	DrawProgBar(bar);
+}
+
+void ResizeProgBar(ProgBar *bar, unsigned int length)
+{
+	if ( length == bar->length ) {
+		return;
+	}
+	ClearProgBar(bar);
+
+	bar->length = length;
+	bar->current_length = 0;
+	UpdateProgBar(bar,bar->progress);
 }
 
 void UpdateProgBar(ProgBar *bar, double current_progress)
@@ -28,21 +63,6 @@ void UpdateProgBar(ProgBar *bar, double current_progress)
 		fputc('\r',bar->stream);
 		DrawProgBar(bar);
 	}
-}
-
-void DrawProgBar(ProgBar *bar)
-{
-	unsigned int empty_length = bar->length - bar->current_length;
-	fputc(PROGBAR_START_SIGN,bar->stream);
-	for (unsigned int i=0; i<bar->current_length; i++) {
-		fputc(PROGBAR_FILL_SIGN,bar->stream);
-	}
-	for (unsigned int i=0; i<empty_length; i++) {
-		fputc(PROGBAR_EMPTY_SIGN,bar->stream);
-	}
-	fputc(PROGBAR_END_SIGN,bar->stream);
-	fprintf(bar->stream," %3u%%",bar->percent);
-	fflush(bar->stream);
 }
 
 void FinishProgBar(ProgBar *bar)
