@@ -13,7 +13,6 @@ PREFIX := /usr/local
 
 $(LIB): $(OBJ)
 	ar crs $@ $<
-	ranlib $@
 
 demo: demo.o $(OBJ)
 	$(CC) $(CFLAGS) $^ -o $@ $(LFLAGS)
