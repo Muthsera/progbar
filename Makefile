@@ -25,8 +25,8 @@ demo.o: demo.c $(HEADER)
 	$(CC) $(CFLAGS) $(OPT) -c $<
 
 install: $(LIB)
-	install $(HEADER) $(PREFIX)/include/
-	install $(LIB) $(PREFIX)/lib/
+	cp -p $(HEADER) $(PREFIX)/include/
+	cp -p $(LIB) $(PREFIX)/lib/
 
 uninstall:
 	rm -f $(PREFIX)/include/$(HEADER)
