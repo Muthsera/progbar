@@ -2,7 +2,7 @@ CC := gcc -std=c99
 CFLAGS := -Wall -Wextra
 OPT := -O3
 DEBUG := -g
-LFLAGS := -lm
+LFLAGS := -lprogbar -lm
 
 LIB := libprogbar.a
 SRC := progbar.c
@@ -12,16 +12,13 @@ HEADER := progbar.h
 PREFIX := /usr/local
 
 $(LIB): $(OBJ)
-	ar crs $@ $<
+	ar crs $@ $(OBJ)
 
-demo: demo.o $(OBJ)
-	$(CC) $(CFLAGS) $^ -o $@ $(LFLAGS)
-
-demo.o: demo.c $(HEADER)
-	$(CC) $(CFLAGS) $(DEBUG) -c $<
+demo: $(LIB) $(HEADER)
+	$(CC) $(DEBUG) $(CFLAGS) -I. -L. demo.c -o $@ $(LFLAGS)
 
 %.o: %.c $(HEADER)
-	$(CC) $(CFLAGS) $(OPT) -c $<
+	$(CC) $(OPT) $(CFLAGS) -c $<
 
 install: $(LIB)
 	cp -p $(HEADER) $(PREFIX)/include/
@@ -31,6 +28,9 @@ uninstall:
 	rm -f $(PREFIX)/include/$(HEADER)
 	rm -f $(PREFIX)/lib/$(LIB)
 
-.PHONY: clean
+.PHONY: clean clean-demo
 clean:
-	rm -f $(LIB) $(OBJ) demo.o demo
+	rm -f $(LIB) $(OBJ)
+
+clean-demo:
+	rm -f demo
