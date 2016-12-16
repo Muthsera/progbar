@@ -3,21 +3,24 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-
-#define PROGBAR_START_SIGN '['
-#define PROGBAR_END_SIGN ']'
-#define PROGBAR_FILL_SIGN '#'
-#define PROGBAR_EMPTY_SIGN ' '
-#define PROGBAR_CLEAR_SIGN ' '
+#include <time.h>
 
 
 typedef struct PROGRESSBAR_s{
 	FILE *stream;
+	int finished;
 	unsigned int length;
+
 	unsigned int percent;
 	unsigned int current_length;
 	double progress;
+
+	time_t start_time;
+	time_t current_time;
+	double seconds_passed;
+	double seconds_estimate;
+	unsigned int hours, mins, secs;
+	int time_length;
 } ProgBar;
 
 void InitProgBar(ProgBar *bar, unsigned int length);
