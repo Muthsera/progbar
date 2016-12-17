@@ -38,6 +38,24 @@ static inline void ClearProgBar(ProgBar *bar)
 	GoToStart(bar);
 }
 
+static inline void CalcTimeEstimate(ProgBar *bar)
+{
+	if ( bar->progress == 0.0 ) {
+		bar->seconds_estimate = 0.0;
+	}
+	else {
+		bar->seconds_estimate = bar->seconds_passed / bar->progress -
+			bar->seconds_passed;
+	}
+}
+
+static inline void CalcUsualTimeFormat(ProgBar *bar, unsigned int seconds)
+{
+	bar->hours = seconds / 3600;
+	bar->mins = seconds / 60 - bar->hours * 60;
+	bar->secs = seconds % 60;
+}
+
 static void DrawProgBar(ProgBar *bar)
 {
 	if ( bar->drawn == 0 ) {
@@ -60,6 +78,13 @@ static void DrawProgBar(ProgBar *bar)
 	}
 	fputc(END_SIGN,bar->stream);
 	fprintf(bar->stream," %3u%%",bar->percent);
+
+	if ( bar->seconds_passed != 0.0 ) {
+		CalcUsualTimeFormat(bar,bar->seconds_estimate);
+		fprintf(bar->stream,"%02u:%02u:%02u%n",
+				bar->hours,bar->mins,bar->secs,&bar->time_length);
+	}
+
 	fflush(bar->stream);
 	bar->atstart = 0;
 }
@@ -82,6 +107,12 @@ void InitProgBarLabel(ProgBar *bar, unsigned int length, const char *label)
 	bar->percent = 0;
 	bar->current_length = 0;
 	bar->progress = 0.0;
+
+	time(&bar->start_time);
+	bar->seconds_passed = 0.0;
+	bar->seconds_estimate = 0.0;
+	bar->time_length = 0;
+
 	DrawProgBar(bar);
 }
 

@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 
 typedef struct PROGRESSBAR_s{
@@ -14,6 +15,13 @@ typedef struct PROGRESSBAR_s{
 	unsigned int percent;
 	unsigned int current_length;
 	double progress;
+
+	time_t start_time;
+	time_t current_time;
+	double seconds_passed;
+	double seconds_estimate;
+	unsigned int hours, mins, secs;
+	int time_length;
 } ProgBar;
 
 
