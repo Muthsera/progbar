@@ -14,8 +14,8 @@ PREFIX := /usr/local
 $(LIB): $(OBJ)
 	ar crs $@ $(OBJ)
 
-demo: $(LIB) $(HEADER)
-	$(CC) $(DEBUG) $(CFLAGS) -I. -L. demo.c -o $@ $(LFLAGS)
+demo: demo.c $(LIB) $(HEADER)
+	$(CC) $(DEBUG) $(CFLAGS) -I. -L. $< -o $@ $(LFLAGS)
 
 %.o: %.c $(HEADER)
 	$(CC) $(OPT) $(CFLAGS) -c $<

@@ -10,11 +10,11 @@
 int main()
 {
 	ProgBar bar;
-	InitProgBar(&bar,80);
+	InitProgBarLabel(&bar,80,"Mandelbrot");
 
-	double x1 = -2.0;
-	double x2 = 2.0;
-	size_t Nx = 1000;
+	double x1 = -3.0;
+	double x2 = 3.0;
+	size_t Nx = 2000;
 	double dx = ( x2 - x1 ) / ( Nx - 1 );
 	double y1 = 2.0;
 	double y2 = -2.0;
@@ -33,7 +33,7 @@ int main()
 			double _Complex z = c;
 
 			unsigned long count = 0;
-			while ( count < 500 && cabs(z) < 200.0 ) {
+			while ( count < 1000 && cabs(z) < 5000.0 ) {
 				z = z*z + c;
 				count++;
 			}
@@ -41,5 +41,7 @@ int main()
 	}
 
 	FinishProgBar(&bar);
+
+	printf("This program has been executed successfully!\n");
 	return 0;
 }
