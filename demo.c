@@ -14,11 +14,11 @@ int main()
 
 	double x1 = -3.0;
 	double x2 = 3.0;
-	size_t Nx = 2000;
+	size_t Nx = 3000;
 	double dx = ( x2 - x1 ) / ( Nx - 1 );
 	double y1 = 2.0;
 	double y2 = -2.0;
-	size_t Ny = 1000;
+	size_t Ny = 2000;
 	double dy = ( y2 - y1 ) / ( Ny - 1 );
 
 	for (size_t i=0; i<Ny; i++) {
@@ -33,7 +33,7 @@ int main()
 			double _Complex z = c;
 
 			unsigned long count = 0;
-			while ( count < 1000 && cabs(z) < 5000.0 ) {
+			while ( count < 1000 && cabs(z) < 1000.0 ) {
 				z = z*z + c;
 				count++;
 			}
