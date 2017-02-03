@@ -21,8 +21,27 @@
 #define ADD_LENGTH 7
 
 
+struct ProgBar_s {
+	FILE *stream;
+	char *label;
+	int atstart, drawn, finished;
+	unsigned int length;
+
+	unsigned int percent;
+	unsigned int current_length;
+	double progress;
+
+	time_t start_time;
+	time_t current_time;
+	double seconds_passed;
+	double seconds_estimate;
+	unsigned int hours, mins, secs;
+	int time_length;
+};
+
+
 static inline
-void GoToStart(ProgBar *bar)
+void GoToStart(ProgBar bar)
 {
 	if ( bar->atstart == 0 ) {
 		for (unsigned int i=0; i<bar->length+ADD_LENGTH+bar->time_length; i++) {
@@ -34,7 +53,7 @@ void GoToStart(ProgBar *bar)
 
 
 static inline
-void ClearProgBar(ProgBar *bar)
+void ClearProgBar(ProgBar bar)
 {
 	GoToStart(bar);
 	for (unsigned int i=0; i<bar->length+ADD_LENGTH+bar->time_length; i++) {
@@ -46,7 +65,7 @@ void ClearProgBar(ProgBar *bar)
 
 
 static inline
-void CalcTimeEstimate(ProgBar *bar)
+void CalcTimeEstimate(ProgBar bar)
 {
 	if ( bar->progress == 0.0 ) {
 		bar->seconds_estimate = 0.0;
@@ -59,7 +78,7 @@ void CalcTimeEstimate(ProgBar *bar)
 
 
 static inline
-void CalcUsualTimeFormat(ProgBar *bar, unsigned int seconds)
+void CalcUsualTimeFormat(ProgBar bar, unsigned int seconds)
 {
 	bar->hours = seconds / 3600;
 	bar->mins = seconds / 60 - bar->hours * 60;
@@ -68,7 +87,7 @@ void CalcUsualTimeFormat(ProgBar *bar, unsigned int seconds)
 
 
 static inline
-void DrawProgBar(ProgBar *bar)
+void DrawProgBar(ProgBar bar)
 {
 	if ( bar->drawn == 0 ) {
 		bar->atstart = 1;
@@ -116,43 +135,47 @@ void DrawProgBar(ProgBar *bar)
 }
 
 
-void InitProgBarLabel(ProgBar *bar, unsigned int length, const char *label)
+ProgBar InitProgBarLabel(unsigned int length, const char *label)
 {
-	bar->stream = stdout;
-	if ( label == NULL ) {
-		bar->label = NULL;
-	}
-	else {
-		size_t label_length = strlen(label);
-		bar->label = malloc( ( label_length+1 ) * sizeof(char) );
-		strcpy(bar->label,label);
-	}
-	bar->atstart = 0;
-	bar->drawn = 0;
-	bar->finished = 0;
-	bar->length = length;
-	bar->percent = 0;
-	bar->current_length = 0;
-	bar->progress = 0.0;
+	ProgBar bar = malloc( sizeof(*bar) );
+	if ( bar != NULL ) {
+		bar->stream = stdout;
+		if ( label == NULL ) {
+			bar->label = NULL;
+		}
+		else {
+			size_t label_length = strlen(label);
+			bar->label = malloc( ( label_length+1 ) * sizeof(char) );
+			strcpy(bar->label,label);
+		}
+		bar->atstart = 0;
+		bar->drawn = 0;
+		bar->finished = 0;
+		bar->length = length;
+		bar->percent = 0;
+		bar->current_length = 0;
+		bar->progress = 0.0;
 
-	time(&bar->start_time);
-	bar->seconds_passed = 0.0;
-	bar->seconds_estimate = 0.0;
-	bar->time_length = 0;
+		time(&bar->start_time);
+		bar->seconds_passed = 0.0;
+		bar->seconds_estimate = 0.0;
+		bar->time_length = 0;
 
-	DrawProgBar(bar);
+		DrawProgBar(bar);
+	}
+	return bar;
 }
 
 
-void InitProgBar(ProgBar *bar, unsigned int length)
+ProgBar InitProgBar(unsigned int length)
 {
-	InitProgBarLabel(bar,length,NULL);
+	return InitProgBarLabel(length,NULL);
 }
 
 
-void ResizeProgBar(ProgBar *bar, unsigned int length)
+void ResizeProgBar(ProgBar bar, unsigned int length)
 {
-	if ( bar->finished == 1 || length == bar->length ) {
+	if ( bar == NULL || bar->finished == 1 || length == bar->length ) {
 		return;
 	}
 	ClearProgBar(bar);
@@ -161,9 +184,9 @@ void ResizeProgBar(ProgBar *bar, unsigned int length)
 }
 
 
-void UpdateProgBar(ProgBar *bar, double current_progress)
+void UpdateProgBar(ProgBar bar, double current_progress)
 {
-	if ( bar->finished == 1 ) {
+	if ( bar == NULL || bar->finished == 1 ) {
 		return;
 	}
 
@@ -189,9 +212,9 @@ void UpdateProgBar(ProgBar *bar, double current_progress)
 }
 
 
-void FinishProgBar(ProgBar *bar)
+void FinishProgBar(ProgBar bar)
 {
-	if ( bar->finished == 0 ) {
+	if ( bar != NULL && bar->finished == 0 ) {
 		UpdateProgBar(bar,1.0);
 		ClearProgBar(bar);
 		CalcUsualTimeFormat(bar,bar->seconds_passed);
@@ -199,5 +222,6 @@ void FinishProgBar(ProgBar *bar)
 				bar->hours,bar->mins,bar->secs);
 		bar->finished = 1;
 		free(bar->label);
+		free(bar);
 	}
 }
