@@ -2,6 +2,8 @@
 #define PROGRESSBAR_H_INCLUDED
 
 
+#define PROGBAR_VERSION 2.0
+
 typedef struct ProgBar_s* ProgBar;
 
 
