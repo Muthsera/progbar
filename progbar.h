@@ -2,11 +2,10 @@
 #define PROGRESSBAR_H_INCLUDED
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <time.h>
 
 
-typedef struct PROGRESSBAR_s{
+typedef struct ProgBar_s {
 	FILE *stream;
 	char *label;
 	int atstart, drawn, finished;

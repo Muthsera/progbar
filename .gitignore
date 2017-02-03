@@ -1,5 +1,10 @@
-demo
+[bB]uild/
+[dD]ep/
+[dD]emo/
+![dD]emo/Makefile
+![dD]emo/*.c
 *.o
 *.a
+*.so
 *~
 ~*

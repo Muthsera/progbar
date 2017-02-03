@@ -1,4 +1,7 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "progbar.h"
 
 
@@ -18,7 +21,8 @@
 #define ADD_LENGTH 7
 
 
-static inline void GoToStart(ProgBar *bar)
+static inline
+void GoToStart(ProgBar *bar)
 {
 	if ( bar->atstart == 0 ) {
 		for (unsigned int i=0; i<bar->length+ADD_LENGTH+bar->time_length; i++) {
@@ -28,7 +32,9 @@ static inline void GoToStart(ProgBar *bar)
 	}
 }
 
-static inline void ClearProgBar(ProgBar *bar)
+
+static inline
+void ClearProgBar(ProgBar *bar)
 {
 	GoToStart(bar);
 	for (unsigned int i=0; i<bar->length+ADD_LENGTH+bar->time_length; i++) {
@@ -38,7 +44,9 @@ static inline void ClearProgBar(ProgBar *bar)
 	GoToStart(bar);
 }
 
-static inline void CalcTimeEstimate(ProgBar *bar)
+
+static inline
+void CalcTimeEstimate(ProgBar *bar)
 {
 	if ( bar->progress == 0.0 ) {
 		bar->seconds_estimate = 0.0;
@@ -49,14 +57,18 @@ static inline void CalcTimeEstimate(ProgBar *bar)
 	}
 }
 
-static inline void CalcUsualTimeFormat(ProgBar *bar, unsigned int seconds)
+
+static inline
+void CalcUsualTimeFormat(ProgBar *bar, unsigned int seconds)
 {
 	bar->hours = seconds / 3600;
 	bar->mins = seconds / 60 - bar->hours * 60;
 	bar->secs = seconds % 60;
 }
 
-static void DrawProgBar(ProgBar *bar)
+
+static inline
+void DrawProgBar(ProgBar *bar)
 {
 	if ( bar->drawn == 0 ) {
 		bar->atstart = 1;
@@ -103,6 +115,7 @@ static void DrawProgBar(ProgBar *bar)
 	bar->atstart = 0;
 }
 
+
 void InitProgBarLabel(ProgBar *bar, unsigned int length, const char *label)
 {
 	bar->stream = stdout;
@@ -130,10 +143,12 @@ void InitProgBarLabel(ProgBar *bar, unsigned int length, const char *label)
 	DrawProgBar(bar);
 }
 
+
 void InitProgBar(ProgBar *bar, unsigned int length)
 {
 	InitProgBarLabel(bar,length,NULL);
 }
+
 
 void ResizeProgBar(ProgBar *bar, unsigned int length)
 {
@@ -144,6 +159,7 @@ void ResizeProgBar(ProgBar *bar, unsigned int length)
 	bar->length = length;
 	UpdateProgBar(bar,bar->progress);
 }
+
 
 void UpdateProgBar(ProgBar *bar, double current_progress)
 {
@@ -171,6 +187,7 @@ void UpdateProgBar(ProgBar *bar, double current_progress)
 		DrawProgBar(bar);
 	}
 }
+
 
 void FinishProgBar(ProgBar *bar)
 {

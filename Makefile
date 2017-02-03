@@ -1,36 +1,63 @@
 CC := gcc -std=c99
-CFLAGS := -Wall -Wextra
+CFLAGS := -Wall -Wextra -pedantic -fpic
 OPT := -O3
-DEBUG := -g
-LFLAGS := -lprogbar -lm
+DEBUG :=
 
-LIB := libprogbar.a
-SRC := progbar.c
-OBJ := progbar.o
-HEADER := progbar.h
+LD := gcc -std=c99
+LINKOPTIONS = $(DEBUG) -shared -Wl,-soname,$(LIBFILE).$(MAJOR_VERSION)
+LFLAGS := -lm
 
+INSTALL := cp -p
+UNINSTALL := rm -f
+AR := ar -crs
+MKDIR := mkdir -pv
+RMDIR := rm -rf
+LDCONFIG := ldconfig
+
+SHELL := /bin/bash
 PREFIX := /usr/local
+INSTALL_LIBDIR := $(PREFIX)/lib
+INSTALL_HEADERDIR := $(PREFIX)/include
 
-$(LIB): $(OBJ)
-	ar crs $@ $(OBJ)
 
-demo: demo.c $(LIB) $(HEADER)
-	$(CC) $(DEBUG) $(CFLAGS) -I. -L. $< -o $@ $(LFLAGS)
+MAJOR_VERSION := 1
+MINOR_VERSION := 4
+VERSION := $(MAJOR_VERSION).$(MINOR_VERSION)
 
-%.o: %.c $(HEADER)
-	$(CC) $(OPT) $(CFLAGS) -c $<
+NAME := progbar
+SRC := $(NAME).c
+HEADER := $(NAME).h
+LIBFILE := lib$(NAME).so
 
-install: $(LIB)
-	cp -p $(HEADER) $(PREFIX)/include/
-	cp -p $(LIB) $(PREFIX)/lib/
+BUILDDIR := build
+OBJ := $(BUILDDIR)/$(NAME).o
+LIB := $(BUILDDIR)/lib$(NAME).so
+
+
+$(LIB).$(VERSION): $(OBJ)
+	$(LD) $(LINKOPTIONS) -o $@ $(OBJ) $(LFLAGS)
+
+$(OBJ): $(SRC) $(HEADER) | $(BUILDDIR)
+	$(CC) $(CFLAGS) $(OPT) $(DEBUG) -c $< -o $@
+
+$(BUILDDIR):
+	$(MKDIR) $@
+
+
+.PHONY: install uninstall clean clean-demo
+install:
+	$(INSTALL) $(HEADER) $(INSTALL_HEADERDIR)
+	$(INSTALL) $(LIB).$(VERSION) $(INSTALL_LIBDIR)
+	ln -fs $(INSTALL_LIBDIR)/$(LIBFILE).$(VERSION) $(INSTALL_LIBDIR)/$(LIBFILE).$(MAJOR_VERSION)
+	ln -fs $(INSTALL_LIBDIR)/$(LIBFILE).$(MAJOR_VERSION) $(INSTALL_LIBDIR)/$(LIBFILE)
+	$(LDCONFIG)
 
 uninstall:
-	rm -f $(PREFIX)/include/$(HEADER)
-	rm -f $(PREFIX)/lib/$(LIB)
+	$(UNINSTALL) $(INSTALL_HEADERDIR)/$(HEADER)
+	$(UNINSTALL) $(INSTALL_LIBDIR)/$(LIBFILE)*
 
-.PHONY: clean clean-demo
 clean:
-	rm -f $(LIB) $(OBJ)
+	$(RMDIR) $(BUILDDIR)
 
 clean-demo:
-	rm -f demo
+	$(MAKE) -C demo
