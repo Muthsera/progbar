@@ -1,10 +1,12 @@
 [bB]uild/
 [dD]ep/
-[dD]emo/
+[dD]emo/*
 ![dD]emo/Makefile
 ![dD]emo/*.c
+![dD]emo/*.h
 *.o
 *.a
 *.so
 *~
 ~*
+Makefile_conf

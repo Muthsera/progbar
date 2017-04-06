@@ -9,18 +9,20 @@ Useful for time consuming console applications
 when you want an estimate of the execution time.
 
 ## Usage
-The bar has to be created and initialised with its length:  
-`ProgBar bar = InitProgBar(40);`
+First, an instance of the bar is created:
+`ProgBar bar;`
 
-Alternatively a label can also be specified:  
-`ProgBar bar = InitProgBarLabel(40,"Iteration");`
+The bar has to be initialised with its length and possibly a label:  
+`ProgBarInit(&bar,40);`  
+`ProgBarInitLabel(&bar,40,"Iteration");`
 
 This also draws an empty bar. The bar is updated by passing progress  
-values in the range [0,1] to it:
-`UpdateProgBar(bar,0.35);`
+values in the range [0,1] to it:  
+`ProgBarUpdate(&bar,0.35);`
 
-After completion, the progress bar is to be deleted and memory is freed:  
-`FinishProgBar(bar);`
+After completion, the progress bar is marked as finished:  
+`ProgBarFinish(&bar);`
 
-If one wishes to resize the bar in the midst of usage, use:  
-`ResizeProgBar(bar,60);`
+If one wishes to resize or relabel the bar in the midst of usage, use:  
+`ProgBarResize(&bar,60);`  
+`ProgBarRelabel(&bar,"Other name");`

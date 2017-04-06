@@ -6,8 +6,6 @@
 #include "progbar.h"
 
 
-#define FABS(x) ( (x) >= 0 ? (x) : -(x) )
-
 #define START_SIGN    '['
 #define END_SIGN      ']'
 #define PROGRESS_SIGN '#'
@@ -39,6 +37,7 @@ static inline void DrawPercent(ProgBar*);
 static inline void DrawTime(ProgBar*);
 
 
+/* Time {{{ */
 static inline
 double CalcTimeEstimate(double passed, double progress)
 {
@@ -46,15 +45,16 @@ double CalcTimeEstimate(double passed, double progress)
 }
 
 static inline
-void ConvertToUsualTimeFormat(unsigned int hms[3], unsigned int estimate)
+void ConvertToUsualTimeFormat(unsigned int hms[3], unsigned int seconds)
 {
-	hms[0] = estimate / 3600;
-	hms[1] = estimate / 60 - hms[0] * 60;
-	hms[2] = estimate % 60;
+	/* hms = hours, minutes, seconds */
+	hms[0] = seconds / 3600;
+	hms[1] = seconds / 60 - hms[0] * 60;
+	hms[2] = seconds % 60;
 }
+/* }}} */
 
-
-#if 1
+/* GoTo {{{ */
 static inline
 void GoToStart(ProgBar *bar)
 {
@@ -148,9 +148,9 @@ void GoToTime(ProgBar *bar)
 	}
 	bar->pos = ProgBarPosTime;
 }
-#endif
+/* }}} */
 
-#if 1
+/* Draw and Clear {{{ */
 static inline
 void DrawStart(ProgBar *bar)
 {
@@ -203,13 +203,12 @@ void DrawTime(ProgBar *bar)
 		fprintf( stdout, " ... ETA: 00:00:00%n", &time_length );
 	}
 	else {
-		unsigned hms[3];
 		if ( (unsigned int)bar->seconds_estimate !=
 				(unsigned int)bar->last_update_estimate ) {
-			ConvertToUsualTimeFormat( hms, bar->seconds_estimate );
+			ConvertToUsualTimeFormat( bar->hms, bar->seconds_estimate );
 		}
 		fprintf( stdout, " ... ETA: %02u:%02u:%02u%n",
-				hms[0], hms[1], hms[2], &time_length );
+				bar->hms[0], bar->hms[1], bar->hms[2], &time_length );
 	}
 
 	int diff_length = bar->time_length - time_length;
@@ -224,8 +223,6 @@ void DrawTime(ProgBar *bar)
 	bar->time_length = time_length;
 	bar->pos = ProgBarPosEnd;
 }
-#endif
-
 
 static inline
 void DrawProgBar(ProgBar *bar)
@@ -243,7 +240,6 @@ void DrawProgBar(ProgBar *bar)
 	fflush(stdout);
 }
 
-
 static inline
 void ClearAll(ProgBar *bar)
 {
@@ -255,8 +251,9 @@ void ClearAll(ProgBar *bar)
 	bar->pos = ProgBarPosEnd;
 	GoToStart(bar);
 }
+/* }}} */
 
-
+/* Init {{{ */
 void ProgBarInit(ProgBar *bar, unsigned int length)
 {
 	ProgBarInitLabel( bar, length, NULL );
@@ -294,8 +291,9 @@ void ProgBarInitLabel(ProgBar *bar, unsigned int length, const char *label)
 
 	DrawProgBar(bar);
 }
+/* }}} */
 
-
+/* Resize and Relabel {{{ */
 void ProgBarResize(ProgBar *bar, unsigned int length)
 {
 	if ( bar == NULL || bar->state == 2 || length == bar->length ) {
@@ -315,7 +313,6 @@ void ProgBarRelabel(ProgBar *bar, const char *label)
 		return;
 	}
 
-	/* free( bar->label ); */
 	ClearAll(bar);
 	bar->label = label;
 	if ( label != NULL ) {
@@ -323,8 +320,9 @@ void ProgBarRelabel(ProgBar *bar, const char *label)
 	}
 	DrawProgBar(bar);
 }
+/* }}} */
 
-
+/* Update {{{ */
 void ProgBarUpdate(ProgBar *bar, double current_progress)
 {
 	if ( bar == NULL || bar->state == 2 ) {
@@ -363,44 +361,21 @@ void ProgBarUpdate(ProgBar *bar, double current_progress)
 		DrawTime(bar);
 		fflush(stdout);
 	}
-
-	/* if ( percent != bar->percent || current_length != bar->current_length ) { */
-	/* 	bar->percent = percent; */
-	/* 	bar->current_length = current_length; */
-	/* 	bar->seconds_estimate = CalcTimeEstimate(bar->seconds_passed,bar->progress); */
-	/* 	bar->last_update_passed = bar->seconds_passed; */
-
-	/* 	GoToBar(bar); */
-	/* 	DrawBar(bar); */
-	/* 	DrawPercent(bar); */
-	/* 	DrawTime(bar); */
-	/* 	fflush(stdout); */
-	/* } */
-	/* else { */
-	/* 	double diff_passed = bar->seconds_passed - bar->last_update_passed; */
-	/* 	if ( diff_passed >= 4.0 ) { */
-	/* 		bar->seconds_estimate = CalcTimeEstimate(bar->seconds_passed,bar->progress); */
-	/* 		bar->last_update_passed = bar->seconds_passed; */
-
-	/* 		GoToTime(bar); */
-	/* 		DrawTime(bar); */
-	/* 		fflush(stdout); */
-	/* 	} */
-	/* } */
 }
+/* }}} */
 
-
+/* Finish {{{ */
 void ProgBarFinish(ProgBar *bar)
 {
-	if ( bar != NULL && bar->state != 1 ) {
+	if ( bar != NULL && bar->state == 1 ) {
 		ProgBarUpdate(bar,1.0);
 		ClearAll(bar);
 
-		unsigned int hms[3];
-		ConvertToUsualTimeFormat( hms, bar->seconds_passed );
+		ConvertToUsualTimeFormat( bar->hms, bar->seconds_passed );
 		fprintf( stdout, "> %s ...finished in %02u:%02u:%02u!\n", bar->label,
-				hms[0], hms[1], hms[2] );
+				bar->hms[0], bar->hms[1], bar->hms[2] );
 
 		bar->state = 2;
 	}
 }
+/* }}} */

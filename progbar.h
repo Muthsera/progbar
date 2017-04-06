@@ -36,6 +36,9 @@ typedef struct ProgBar_s {
 	double seconds_estimate;
 	double last_update_passed;
 	double last_update_estimate;
+
+	/* hms = hours, minutes, seconds */
+	unsigned int hms[3];
 } ProgBar;
 
 
