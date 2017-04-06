@@ -1,0 +1,3 @@
+PREFIX = /usr/local
+LIBEXT := a
+CREATELIB = $(AR) $(ARFLAGS)

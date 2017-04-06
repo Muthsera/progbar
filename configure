@@ -1,0 +1,64 @@
+#!/bin/bash
+
+makefile="Makefile_conf"
+prefix="/usr/local"
+libtype="SHARED"
+
+while :; do
+	case $1 in
+		-h|-\?|--help)
+			echo 'usage: ./configure [options]'
+			echo 'options:'
+			echo '  --prefix=<path>: installation directory, defaults to "/usr/local"'
+			echo '  --lib=[ static | shared ]: determines whether to build a static or a shared library, defaults to "shared"'
+			exit 0
+			;;
+
+		--prefix=?*)
+			prefix=${1#*=}
+			;;
+
+		--lib=?*|--libtype=?*)
+			libtype=$(echo "${1#*=}" | tr [:lower:] [:upper:])
+			;;
+
+		--)			# end of options
+			shift
+			break
+			;;
+
+		-?*)
+			echo "WARNING: Unknown option: $1"
+			echo 'Type "./configure --help" for a list of valid options'
+			exit 1
+			;;
+
+		*)			# default case: if no more options quit loop
+			break
+	esac
+
+	shift
+done
+
+
+echo 'Generating Makefile ...'
+echo "PREFIX = $prefix" > $makefile
+
+case "$libtype" in
+	"SHARED")
+		echo "CFLAGS += -fpic" >> $makefile
+		echo "LIBEXT := so" >> $makefile
+		echo 'CREATELIB = $(LD) $(LINKOPTIONS) -o' >> $makefile
+		echo 'CREATEFLAGS := $(LDFLAGS)' >> $makefile
+		echo 'CALL_AFTER_INSTALL := $(LDCONFIG)' >> $makefile
+		;;
+	"STATIC")
+		echo "LIBEXT := a" >> $makefile
+		echo 'CREATELIB = $(AR) $(ARFLAGS)' >> $makefile
+		;;
+	*)
+		echo 'ERROR: Invalid parameter passed to option "libtype"'
+		exit 1
+esac
+
+echo 'Configuration complete, type "make" to build'

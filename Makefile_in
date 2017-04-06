@@ -1,0 +1,23 @@
+# #####################################
+# Variables for build process
+# #####################################
+
+SHELL := /bin/bash
+
+CC := gcc -std=c99
+CFLAGS := -Wall -Wextra -Wpedantic
+OPT := -O3
+COPTIONS = $(DEBUG) $(OPT) $(CFLAGS) $(DFLAGS)
+
+LD := gcc
+LINKOPTIONS = $(DEBUG) $(OPT) -shared -Wl,-soname,$(LIBFILE).$(MAJOR_VERSION)
+LDFLAGS :=
+
+INSTALL := cp -p
+UNINSTALL := rm -f
+AR := ar
+ARFLAGS := -crs
+MKDIR := mkdir -pv
+RM := rm -f
+RMDIR := rm -rf
+LDCONFIG := ldconfig

@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include <math.h>
 #include <complex.h>
-#include <unistd.h>
 
 #include "../progbar.h"
 
 
 int main()
 {
-	ProgBar bar = InitProgBarLabel(80,"Mandelbrot");
+	ProgBar bar;
+	ProgBarInitLabel(&bar,80,"Mandelbrot");
 
 	double x1 = -3.0;
 	double x2 = 3.0;
@@ -22,9 +22,9 @@ int main()
 
 	for (size_t i=0; i<Ny; i++) {
 		if ( i == Ny/2 ) {
-			ResizeProgBar(bar,40);
+			ProgBarResize(&bar,40);
 		}
-		UpdateProgBar(bar,(double)i/Ny);
+		ProgBarUpdate(&bar,(double)i/Ny);
 		double y = y1 + i*dy;
 		for (size_t j=0; j<Nx; j++) {
 			double x = x1 + j*dx;
@@ -39,7 +39,7 @@ int main()
 		}
 	}
 
-	FinishProgBar(bar);
+	ProgBarFinish(&bar);
 
 	printf("This program has been executed successfully!\n");
 	return 0;
