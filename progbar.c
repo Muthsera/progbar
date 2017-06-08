@@ -165,8 +165,8 @@ void DrawLabel(ProgBar *bar)
 	GoToLabel(bar);
 	if ( bar->label != NULL ) {
 		fputs( bar->label, stdout );
+		fputc( ' ', stdout );
 	}
-	fputc( ' ', stdout );
 	bar->pos = ProgBarPosBar;
 }
 
@@ -372,8 +372,12 @@ void ProgBarFinish(ProgBar *bar)
 		ClearAll(bar);
 
 		ConvertToUsualTimeFormat( bar->hms, bar->seconds_passed );
-		fprintf( stdout, "> %s ...finished in %02u:%02u:%02u!\n", bar->label,
-				bar->hms[0], bar->hms[1], bar->hms[2] );
+		fprintf(stdout, "> ");
+		if ( bar->label != NULL ) {
+			fprintf(stdout, "%s... ", bar->label);
+		}
+		fprintf(stdout, "Finished in %02u:%02u:%02u!\n",
+				bar->hms[0], bar->hms[1], bar->hms[2]);
 
 		bar->state = 2;
 	}

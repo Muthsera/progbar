@@ -6,7 +6,7 @@ TARGETS := $(SRCS:.c=)
 default all demo: $(TARGETS)
 
 %: %.c $(HEADERS)
-	gcc -std=c99 -Wall -Wextra -Wpedantic -o $@ $< --static -L../build -lprogbar -lm
+	gcc -std=c99 -Wall -Wextra -Wpedantic -o $@ $< -L../build -lprogbar -lm
 
 
 .PHONY: clean clean-demo

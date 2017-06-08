@@ -6,16 +6,18 @@
 #include <time.h>
 
 
-typedef struct ProgBar_s {
-	int state;
-	enum {
+enum ProgBarPositions {
 		ProgBarPosStart,
 		ProgBarPosLabel,
 		ProgBarPosBar,
 		ProgBarPosPercent,
 		ProgBarPosTime,
 		ProgBarPosEnd
-	} pos;
+};
+
+typedef struct ProgBar_s {
+	int state;
+	enum ProgBarPositions pos;
 
 	const char *label;
 	size_t label_length;
