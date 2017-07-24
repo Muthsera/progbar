@@ -8,17 +8,15 @@
 
 int main()
 {
-	struct timespec wait_time = { 0, 050000000 };
-	progress_bar2 bar;
-	progress_bar2_label_init(&bar,20,"Test");
+	struct timespec wait_time = { 0, 50000000 };
+	progress_bar bar;
+	progress_bar_label_init(&bar,20,"Test");
 
 	for (int i=0; i<N; i++) {
 		nanosleep(&wait_time,NULL);
-		progress_bar2_update(&bar,(double)(i+1)/N);
+		progress_bar_update(&bar,(double)(i+1)/N);
 	}
-	progress_bar2_finish(&bar);
-
-	printf("Finished now!\n");
+	progress_bar_finish(&bar);
 
 	return 0;
 }
