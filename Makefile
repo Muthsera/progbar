@@ -9,43 +9,53 @@ include Makefile_in
 # Variables describing the project
 # #####################################
 
-LIBNAME := progbar
+LIBNAME := progress
 HEADER := $(LIBNAME).h
-MAJOR_VERSION := 2
-MINOR_VERSION := 2
+MAJOR_VERSION := 3
+MINOR_VERSION := 0
 VERSION := $(MAJOR_VERSION).$(MINOR_VERSION)
 
-SRCDIR := .
+
+SRCDIR := src
 BUILDDIR := build
+DEPDIR := dep
 DEMODIR := demo
 
-SRC := $(LIBNAME).c
-OBJ := $(BUILDDIR)/$(LIBNAME).o
+SRCS := $(wildcard $(SRCDIR)/*.c)
+SRCNAMES := $(notdir $(SRCS))
+OBJNAMES := $(SRCNAMES:.c=.o)
+DEPNAMES := $(SRCNAMES:.c=.d)
+OBJS := $(addprefix $(BUILDDIR)/,$(OBJNAMES) )
+DEPS := $(addprefix $(DEPDIR)/,$(DEPNAMES) )
+
+LDFLAGS := -lpthread
 
 
-# #####################################
+#################################################
 # Use input from configure
-# #####################################
+#################################################
 
 include Makefile_conf
 
 INSTALL_LIBDIR := $(PREFIX)/lib
 INSTALL_HEADERDIR := $(PREFIX)/include
-
 LIBFILE := lib$(LIBNAME).$(LIBEXT)
 
 
-# #####################################
+#################################################
 # building libs
-# #####################################
+#################################################
 
-$(BUILDDIR)/$(LIBFILE): $(OBJ)
-	$(CREATELIB) $@ $^ $(LDFLAGS)
+$(BUILDDIR)/$(LIBFILE): $(OBJS) | $(BUILDDIR)
+	$(CREATELIB) $@ $^ $(CREATEFLAGS)
 
-$(OBJ): $(SRC) $(HEADER) | $(BUILDDIR)
+$(BUILDDIR)/%.o: $(SRCDIR)/%.c | $(DEPDIR) $(BUILDDIR)
+	@$(CC) $(COPTIONS) -MM -MT $@ -MP -MF $(DEPDIR)/$*.d $<
 	$(CC) $(COPTIONS) -c -o $@ $<
 
-$(BUILDDIR):
+-include $(DEPFILES)
+
+$(BUILDDIR) $(DEPDIR):
 	@$(MKDIR) $@
 
 
@@ -54,24 +64,24 @@ demo:
 	$(MAKE) -C $(DEMODIR)
 
 
-# #####################################
+#################################################
 # clean up
-# #####################################
+#################################################
 
 .PHONY: clean distclean clean-demo
 clean:
-	$(RMDIR) $(BUILDDIR)
+	$(RMDIR) $(BUILDDIR) $(DEPDIR)
 
 distclean: clean
 	$(RM) Makefile_conf
 
 clean-demo:
-	$(MAKE) -C demo clean
+	$(MAKE) -C $(DEMODIR) clean
 
 
-# #####################################
+#################################################
 # install
-# #####################################
+#################################################
 
 .PHONY: install
 install: | $(INSTALL_LIBDIR) $(INSTALL_HEADERDIR)
@@ -82,12 +92,12 @@ install: | $(INSTALL_LIBDIR) $(INSTALL_HEADERDIR)
 $(INSTALL_LIBDIR) $(INSTALL_HEADERDIR):
 	@$(MKDIR) $@
 
-
-# #####################################
+#############################################
 # uninstall
-# #####################################
+#################################################
 
 .PHONY: uninstall
 uninstall:
 	$(UNINSTALL) $(INSTALL_LIBDIR)/$(LIBFILE)
 	$(UNINSTALL) $(INSTALL_HEADERDIR)/$(HEADER)
+	$(LDCONFIG)

@@ -3,13 +3,13 @@
 #include <math.h>
 #include <complex.h>
 
-#include "../progbar.h"
+#include "../progress.h"
 
 
 int main()
 {
-	ProgBar bar;
-	ProgBarInitLabel(&bar,80,"Mandelbrot");
+	progress_bar bar;
+	progress_bar_label_init(&bar,80,"Mandelbrot");
 
 	double x1 = -3.0;
 	double x2 = 3.0;
@@ -22,9 +22,9 @@ int main()
 
 	for (size_t i=0; i<Ny; i++) {
 		if ( i == Ny/2 ) {
-			ProgBarResize(&bar,40);
+			/* progress_bar_resize(&bar,40); */
 		}
-		ProgBarUpdate(&bar,(double)i/Ny);
+		progress_bar_update(&bar,(double)i/Ny);
 		double y = y1 + i*dy;
 		for (size_t j=0; j<Nx; j++) {
 			double x = x1 + j*dx;
@@ -39,7 +39,7 @@ int main()
 		}
 	}
 
-	ProgBarFinish(&bar);
+	progress_bar_finish(&bar);
 
 	printf("This program has been executed successfully!\n");
 	return 0;
