@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 199309L
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,6 +7,7 @@
 #include <pthread.h>
 #include <errno.h>
 
+#include <time.h>
 #include <sys/time.h>
 
 #include "../progress.h"
@@ -95,6 +98,9 @@ void progress_bar_update(progress_bar *bar, const double progress)
 static inline
 void* progress_bar_running(void *arg)
 {
+	/* wait 1/8 second between updates */
+	const struct timespec sleep_time = { 0, 125000000 };
+
 	progress_bar *bar = arg;
 	struct timeval start_time, current_time, diff_time;
 	int print_length;
@@ -146,6 +152,8 @@ void* progress_bar_running(void *arg)
 		print_length += 2 + bar->length;
 
 		fflush(stdout);
+
+		nanosleep(&sleep_time,NULL);
 	}
 
 

@@ -59,6 +59,7 @@ void progress_indicator_finish(progress_indicator *ind)
 static inline
 void* progress_indicator_running(void *arg)
 {
+	/* update every 1/8 second */
 	const struct timespec sleep_time = { 0, 125000000 };
 	const char symbols[4] = { '|', '/', '-', '\\' };
 
