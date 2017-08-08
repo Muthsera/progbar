@@ -28,7 +28,9 @@ DEPNAMES := $(SRCNAMES:.c=.d)
 OBJS := $(addprefix $(BUILDDIR)/,$(OBJNAMES) )
 DEPS := $(addprefix $(DEPDIR)/,$(DEPNAMES) )
 
-LDFLAGS := -lpthread
+# use nanosleep function in time.h
+DFLAGS := -D_POSIX_C_SOURCE=199309L
+LDFLAGS := -pthread
 
 
 #################################################
